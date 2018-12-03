@@ -28,13 +28,15 @@ end
 -- @tparam string name: device name string from USB
 -- @param types: array of supported event types. keys are type codes, values are strings
 -- @param codes: array of supported codes. each entry is a table of codes of a given type. subtables are indexed by supported code numbers; values are code names
-function Hid.new(id, name, types, codes)
+-- @tparam userdata dev : opaque pointer to device
+function Hid.new(id, name, types, codes, dev)
   local d = setmetatable({}, Hid)
   -- print(id, name, types, codes)
   d.id = id
   d.name = name
   d.types = types
   d.codes = {}
+  d.dev = dev
   d.callbacks = {}
   for i,t in pairs(types) do
     if Hid.event_types[t] ~= nil then
@@ -106,6 +108,11 @@ function Hid:print()
   end
 end
 
+--- write data to a device
+function Hid:write(msg)
+  hid_send(self.dev, msg)
+end
+
 -- -------------------------------------------------
 -- global norns functions (C glue)
 
@@ -114,8 +121,8 @@ end
 -- @param name (string)
 -- @param types - table of event types  (int)
 -- @param codes - table of table of event codes (int), indexed by type (int)
-norns.hid.add = function(id, name, types, codes)
-  local d = Hid.new(id, name, types, codes)
+norns.hid.add = function(id, name, types, codes, dev)
+  local d = Hid.new(id, name, types, codes, dev)
   Hid.devices[id] = d
   if Hid.add ~= nil then Hid.add(d) end
 end
@@ -145,7 +152,9 @@ norns.hid.event = function(id, ev_type, ev_code, value)
   if  dev then
     local cb = dev.callbacks[ev_code_name]
     if cb then
-   cb(value)
+      cb(value)
+    else
+      -- print("norns.hid.event unhandled ", id, ev_type, ev_type_name, ev_code, ev_code_name, value)
     end
   end
 end
@@ -433,6 +442,14 @@ Hid.event_codes[Hid.event_types_rev['EV_KEY']] = {
   [0x107] = 'BTN_7',
   [0x108] = 'BTN_8',
   [0x109] = 'BTN_9',
+  -- BTN_10 through BTN_15 are nonstandard, not in libevdev
+  [0x10A] = 'BTN_10',
+  [0x10B] = 'BTN_11',
+  [0x10C] = 'BTN_12',
+  [0x10D] = 'BTN_13',
+  [0x10E] = 'BTN_14',
+  [0x10F] = 'BTN_15',
+  -- end nonstandard codes
   [0x110] = 'BTN_MOUSE',
   [0x110] = 'BTN_LEFT',
   [0x111] = 'BTN_RIGHT',
