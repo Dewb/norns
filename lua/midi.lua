@@ -93,7 +93,7 @@ function Midi.connect(n)
     index = Midi.vport[n].index,
     port = n,
     event = function(data)
-        print("midi input")
+--        print("midi input")
       end,
     attached = function() return Midi.vport[n].attached end,
     send = function(data) Midi.vport[n].send(data) end,

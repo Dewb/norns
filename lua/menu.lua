@@ -607,8 +607,13 @@ m.redraw[pPARAMS] = function()
                   screen.fill()
                 end
               else
-                screen.text_right(params:string(param_index))
-              end
+                value = params:string(param_index)
+		if value then
+                  screen.text_right(params:string(param_index))
+                else
+	          print("Bad string value for param " .. params:get_name(param_index))
+		end
+	      end
             end
           end
         end
