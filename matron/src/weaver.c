@@ -1001,8 +1001,8 @@ int _screen_peek(lua_State *l) {
     int w = luaL_checkinteger(l, 3);
     int h = luaL_checkinteger(l, 4);
     lua_settop(l, 0);
-    if ((x >= 0) && (x <= 127)
-     && (y >= 0) && (y <= 63)
+    if ((x >= 0) 
+     && (y >= 0) 
      && (w > 0)
      && (h > 0)) {
         char* buf = screen_peek(x, y, &w, &h);

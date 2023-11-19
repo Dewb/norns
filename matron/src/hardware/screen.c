@@ -459,21 +459,33 @@ void screen_display_png(const char *filename, double x, double y) {
 
 char *screen_peek(int x, int y, int *w, int *h) {
     CHECK_CRR
-    *w = (*w <= (128 - x)) ? (*w) : (128 - x);
-    *h = (*h <= (64 - y))  ? (*h) : (64 - y);
+
+    cairo_surface_t *s = cairo_get_target(cr);
+    if (!s)
+    {
+        return NULL;
+    }
+
+    cairo_surface_flush(s);
+
+    int iw = cairo_image_surface_get_width(s);
+    int ih = cairo_image_surface_get_height(s);
+    *w = (*w <= (iw - x)) ? (*w) : (iw - x);
+    *h = (*h <= (ih - y))  ? (*h) : (ih - y); 
+    
     char *buf = malloc(*w * *h);
     if (!buf) {
         return NULL;
     }
-    cairo_surface_flush(surface);
-    uint32_t *data = (uint32_t *)cairo_image_surface_get_data(surface);
+
+    uint32_t *data = (uint32_t *)cairo_image_surface_get_data(s);
     if (!data) {
         return NULL;
     }
     char *p = buf;
     for (int j = y; j < y + *h; j++) {
         for (int i = x; i < x + *w; i++) {
-            *p = data[j * 128 + i] & 0xF;
+            *p = data[j * 128 + i] & 0xFF;
             p++;
         }
     }
