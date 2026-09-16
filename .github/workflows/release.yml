@@ -1,0 +1,55 @@
+name: release
+
+on:
+  pull_request: # delete this after the workflow has been triggered once
+  workflow_dispatch:
+    inputs:
+      release_name:
+        description: 'Date code of release'
+        required: true
+        type: string
+
+# todo: make the regular compile job a reusable workflow, and call it from here
+jobs:
+  compile-norns:
+    runs-on: ubuntu-24.04-arm
+    steps:
+    - uses: actions/checkout@v7
+      with:
+        submodules: recursive
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v4
+      with:
+        registry: ghcr.io
+        username: ${{ github.repository_owner }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    - name: Pre-build dev container image and run build inside dev container
+      uses: devcontainers/ci@v0.3
+      with:
+        imageName: ghcr.io/monome/norns-ci
+        cacheFrom: ghcr.io/monome/norns-ci
+        push: filter
+        refFilterForPush: refs/heads/main
+        runCmd: ./waf configure --release && ./waf build --release 
+    - name: Pack update archive
+      run: |
+        shopt -s extglob
+        mkdir ${RELEASE_NAME}
+        cp update/* .
+        mv !(${RELEASE_NAME}) ${RELEASE_NAME}
+        tar czvf norns${RELEASE_NAME}.tgz ${RELEASE_NAME}/
+        sha256sum norns${RELEASE_NAME}.tgz > norns${RELEASE_NAME}.sha256
+      env:
+        RELEASE_NAME: ${{ inputs.release_name || '000000' }}
+    - name: 'Upload release archive'
+      uses: actions/upload-artifact@v7
+      with:
+        name: norns${{ inputs.release_name || '000000'}}.tgz
+        path: norns${{ inputs.release_name || '000000'}}.tgz
+        archive: false
+    - name: 'Upload release checksum'
+      uses: actions/upload-artifact@v7
+      with:
+        name: norns${{ inputs.release_name || '000000'}}.sha256
+        path: norns${{ inputs.release_name || '000000'}}.sha256
+        archive: false
