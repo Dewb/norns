@@ -1,0 +1,51 @@
+name: Package Update and Post Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_name:
+        description: 'Date code of release'
+        required: true
+        type: string
+
+jobs:
+  compile-norns:
+    runs-on: ubuntu-24.04-arm
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: recursive
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v2 
+      with:
+        registry: ghcr.io
+        username: ${{ github.repository_owner }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    - name: Pre-build dev container image and run build inside dev container
+      uses: devcontainers/ci@v0.3
+      with:
+        imageName: ghcr.io/monome/norns-ci
+        cacheFrom: ghcr.io/monome/norns-ci
+        push: filter
+        refFilterForPush: refs/heads/main
+        runCmd: ./waf configure --release && ./waf build --release 
+    - name: Pack update archive
+      run: |
+        mkdir $(RELEASE_NAME)
+        mv * $(RELEASE_NAME)
+        tar czvf norns$(RELEASE_NAME).tgz $(RELEASE_NAME)/
+        sha256sum norns$(RELEASE_NAME).tgz > norns$(RELEASE_NAME).sha256
+      env:
+        RELEASE_NAME: ${{ inputs.release_name }}
+    - name: 'Upload release archive'
+      uses: actions/upload-artifact@v4
+      with:
+        name: join(inputs.release_name, 'release package')
+        path: join('norns', inputs.release_name, '.tgz')
+        archive: false
+    - name: 'Upload release checksum'
+      uses: actions/upload-artifact@v4
+      with:
+        name: join(inputs.release_name, 'release package sha256 checksum')
+        path: join('norns', inputs.release_name, '.sha256')
+        archive: false
