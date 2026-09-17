@@ -44,6 +44,7 @@ jobs:
         cp -r !(${RELEASE_NAME}) ${RELEASE_NAME}/norns
         curl -LO https://github.com/monome/maiden/releases/download/v1.1.5/maiden-v1.1.5.tgz
         tar xzvf maiden-v1.1.5.tgz
+        mv maiden ${RELEASE_NAME}
         rm maiden-v1.1.5.tgz
         tar czvf norns${RELEASE_NAME}.tgz ${RELEASE_NAME}/
         sha256sum norns${RELEASE_NAME}.tgz > norns${RELEASE_NAME}.sha256
