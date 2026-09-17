@@ -40,13 +40,8 @@ jobs:
         sha256sum norns${RELEASE_NAME}.tgz > norns${RELEASE_NAME}.sha256
       env:
         RELEASE_NAME: ${{ inputs.release_name || '000000' }}
-    - name: 'Upload release archive'
+    - name: 'Upload release'
       uses: actions/upload-artifact@v4
       with:
-        name: ${{ inputs.release_name || '000000'}}update package
-        path: norns${{ inputs.release_name || '000000'}}.tgz
-    - name: 'Upload release checksum'
-      uses: actions/upload-artifact@v4
-      with:
-        name: ${{ inputs.release_name || '000000'}}update package checksum
-        path: norns${{ inputs.release_name || '000000'}}.sha256
+        name: norns${{ inputs.release_name || '000000'}} archive and sha256 checksum
+        path: norns${{ inputs.release_name || '000000'}}.*
