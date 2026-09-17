@@ -42,6 +42,11 @@ jobs:
         cp update/changelog.txt ${RELEASE_NAME}
         cp update/version.txt ${RELEASE_NAME}
         cp -r !(${RELEASE_NAME}) ${RELEASE_NAME}/norns
+        curl -L https://raw.githubusercontent.com/monome/norns-image/refs/heads/norns-converged/config/norns-main.service -o ${RELEASE_NAME}/config/norns-main.service
+        curl -L https://raw.githubusercontent.com/monome/norns-image/refs/heads/norns-converged/config/norns-sclang.service -o ${RELEASE_NAME}/config/norns-sclang.service
+        curl -L https://raw.githubusercontent.com/monome/norns-image/refs/heads/norns-converged/config/norns.target -o ${RELEASE_NAME}/config/norns.target
+        curl -L https://raw.githubusercontent.com/monome/norns-image/refs/heads/norns-converged/config/norns-watcher.service -o ${RELEASE_NAME}/config/norns-watcher.service
+        curl -L https://raw.githubusercontent.com/monome/norns-image/refs/heads/norns-converged/config/norns-jack.service -o ${RELEASE_NAME}/config/norns-jack.service
         curl -LO https://github.com/monome/maiden/releases/download/v1.1.5/maiden-v1.1.5.tgz
         tar xzvf maiden-v1.1.5.tgz
         mv maiden ${RELEASE_NAME}
