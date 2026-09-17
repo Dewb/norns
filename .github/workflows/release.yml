@@ -35,6 +35,7 @@ jobs:
       run: |
         shopt -s extglob
         mkdir ${RELEASE_NAME}
+        cp update/* .
         mv !(${RELEASE_NAME}) ${RELEASE_NAME}
         tar czvf norns${RELEASE_NAME}.tgz ${RELEASE_NAME}/
         sha256sum norns${RELEASE_NAME}.tgz > norns${RELEASE_NAME}.sha256
