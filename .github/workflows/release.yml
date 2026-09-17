@@ -34,22 +34,29 @@ jobs:
     - name: Pack update archive
       run: |
         shopt -s extglob
-        mkdir ${RELEASE_NAME}
-        cp update/* .
-        mv !(${RELEASE_NAME}) ${RELEASE_NAME}
+        mkdir -p ${RELEASE_NAME}/norns
+        mkdir -p ${RELEASE_NAME}/config
+        mkdir -p ${RELEASE_NAME}/lib
+        mkdir -p ${RELEASE_NAME}/packages
+        cp update/update.sh ${RELEASE_NAME}
+        cp update/changelog.txt ${RELEASE_NAME}
+        cp update/version.txt ${RELEASE_NAME}
+        cp -r !(${RELEASE_NAME}) ${RELEASE_NAME}/norns
+        curl -LO https://github.com/monome/maiden/releases/download/v1.1.5/maiden-v1.1.5.tgz
+        tar xzvf maiden-v1.1.5.tgz
+        mv maiden ${RELEASE_NAME}
+        rm maiden-v1.1.5.tgz
         tar czvf norns${RELEASE_NAME}.tgz ${RELEASE_NAME}/
         sha256sum norns${RELEASE_NAME}.tgz > norns${RELEASE_NAME}.sha256
       env:
-        RELEASE_NAME: ${{ inputs.release_name || '000000' }}
+        RELEASE_NAME: ${{ inputs.release_name || '999999' }}
     - name: 'Upload release archive'
       uses: actions/upload-artifact@v7
       with:
-        name: norns${{ inputs.release_name || '000000'}}.tgz
-        path: norns${{ inputs.release_name || '000000'}}.tgz
+        path: norns${{ inputs.release_name || '999999'}}.tgz
         archive: false
     - name: 'Upload release checksum'
       uses: actions/upload-artifact@v7
       with:
-        name: norns${{ inputs.release_name || '000000'}}.sha256
-        path: norns${{ inputs.release_name || '000000'}}.sha256
+        path: norns${{ inputs.release_name || '999999'}}.sha256
         archive: false
