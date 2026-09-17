@@ -9,6 +9,7 @@ on:
         required: true
         type: string
 
+# todo: make the regular compile job a reusable workflow, and call it from here
 jobs:
   compile-norns:
     runs-on: ubuntu-24.04-arm
@@ -43,9 +44,9 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: ${{ inputs.release_name || '000000'}}update package
-        path: ${{ inputs.release_name || '000000'}}.tgz
+        path: norns${{ inputs.release_name || '000000'}}.tgz
     - name: 'Upload release checksum'
       uses: actions/upload-artifact@v4
       with:
         name: ${{ inputs.release_name || '000000'}}update package checksum
-        path: ${{ inputs.release_name || '000000'}}.sha256
+        path: norns${{ inputs.release_name || '000000'}}.sha256
