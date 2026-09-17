@@ -1,4 +1,4 @@
-name: Package Update and Post Release
+name: release
 
 on:
   pull_request: # delete this after the workflow has been triggered once
@@ -37,16 +37,16 @@ jobs:
         tar czvf norns$(RELEASE_NAME).tgz $(RELEASE_NAME)/
         sha256sum norns$(RELEASE_NAME).tgz > norns$(RELEASE_NAME).sha256
       env:
-        RELEASE_NAME: ${{ inputs.release_name }}
+        RELEASE_NAME: ${{ inputs.release_name || '000000' }}
     - name: 'Upload release archive'
       uses: actions/upload-artifact@v4
       with:
-        name: join(inputs.release_name, 'release package')
-        path: join('norns', inputs.release_name, '.tgz')
+        name: join(inputs.release_name || '000000', 'release package')
+        path: join('norns', inputs.release_name || '000000', '.tgz')
         archive: false
     - name: 'Upload release checksum'
       uses: actions/upload-artifact@v4
       with:
-        name: join(inputs.release_name, 'release package sha256 checksum')
-        path: join('norns', inputs.release_name, '.sha256')
+        name: join(inputs.release_name || '000000', 'release package sha256 checksum')
+        path: join('norns', inputs.release_name || '000000', '.sha256')
         archive: false
