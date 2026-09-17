@@ -1,6 +1,7 @@
 name: Package Update and Post Release
 
 on:
+  pull_request: # delete this after the workflow has been triggered once
   workflow_dispatch:
     inputs:
       release_name:
