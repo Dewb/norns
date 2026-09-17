@@ -32,10 +32,10 @@ jobs:
         runCmd: ./waf configure --release && ./waf build --release 
     - name: Pack update archive
       run: |
-        mkdir $(RELEASE_NAME)
-        mv * $(RELEASE_NAME)
-        tar czvf norns$(RELEASE_NAME).tgz $(RELEASE_NAME)/
-        sha256sum norns$(RELEASE_NAME).tgz > norns$(RELEASE_NAME).sha256
+        mkdir ${RELEASE_NAME}
+        mv * ${RELEASE_NAME}
+        tar czvf norns${RELEASE_NAME}.tgz ${RELEASE_NAME}/
+        sha256sum norns${RELEASE_NAME}.tgz > norns${RELEASE_NAME}.sha256
       env:
         RELEASE_NAME: ${{ inputs.release_name || '000000' }}
     - name: 'Upload release archive'
