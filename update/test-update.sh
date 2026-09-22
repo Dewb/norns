@@ -160,11 +160,7 @@ make_release_fixture() {
 	write_ok_script "$RELEASE_DIR/norns/build/maiden-repl/maiden-repl"
 	write_ok_script "$RELEASE_DIR/maiden/project-setup.sh"
 	printf 'maiden\n' > "$RELEASE_DIR/maiden/index.html"
-	local f
-	for f in journald.conf logrotate.conf norns-jack.service norns-main.service \
-		norns-sclang.service norns-watcher.service norns.target raspi.list; do
-		printf 'stub\n' > "$RELEASE_DIR/config/$f"
-	done
+	cp -r image/config/* "$RELEASE_DIR/config"
 	printf '%s\n' "$TEST_VERSION" > "$RELEASE_DIR/version.txt"
 	printf 'changelog\n' > "$RELEASE_DIR/changelog.txt"
 }
