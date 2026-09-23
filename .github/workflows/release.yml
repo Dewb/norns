@@ -6,8 +6,14 @@ on:
     inputs:
       release_name:
         description: 'Date code of release'
-        required: true
         type: string
+        required: true
+        default: '999999'
+      maiden_tag:
+        description: 'Maiden release tag to include'
+        type: string
+        required: true
+        default: 'v1.1.5'
 
 # todo: make the regular compile job a reusable workflow, and call it from here
 jobs:
@@ -43,21 +49,22 @@ jobs:
         cp update/version.txt ${RELEASE_NAME}
         cp -r !(${RELEASE_NAME}) ${RELEASE_NAME}/norns
         cp -r image/config/* ${RELEASE_NAME}/config
-        curl -LO https://github.com/monome/maiden/releases/download/v1.1.5/maiden-v1.1.5.tgz
-        tar xzvf maiden-v1.1.5.tgz
+        curl -LO https://github.com/monome/maiden/releases/download/${MAIDEN_TAG}/maiden-${MAIDEN_TAG}.tgz
+        tar xzvf maiden-${MAIDEN_TAG}.tgz
         mv maiden ${RELEASE_NAME}
-        rm maiden-v1.1.5.tgz
+        rm maiden-${MAIDEN_TAG}.tgz
         tar czvf norns${RELEASE_NAME}.tgz ${RELEASE_NAME}/
         sha256sum norns${RELEASE_NAME}.tgz > norns${RELEASE_NAME}.sha256
       env:
         RELEASE_NAME: ${{ inputs.release_name || '999999' }}
+        MAIDEN_TAG: ${{ inputs.maiden_tag || 'v1.1.5' }}
     - name: 'Upload release archive'
       uses: actions/upload-artifact@v7
       with:
-        path: norns${{ inputs.release_name || '999999'}}.tgz
+        path: norns${{ inputs.release_name || '999999' }}.tgz
         archive: false
     - name: 'Upload release checksum'
       uses: actions/upload-artifact@v7
       with:
-        path: norns${{ inputs.release_name || '999999'}}.sha256
+        path: norns${{ inputs.release_name || '999999' }}.sha256
         archive: false
