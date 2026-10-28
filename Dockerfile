@@ -1,4 +1,8 @@
-FROM --platform=linux/arm/v8 dtcooper/raspberrypi-os:bullseye AS build_armv8
+ARG DEBIAN_DIST_NAME=trixie
+ARG BASE_IMAGE=n4jm4/raspberry-pi-os:$DEBIAN_DIST_NAME
+ARG PLATFORM=linux/arm/v8
+
+FROM --platform=$PLATFORM $BASE_IMAGE AS pios_builder
 LABEL org.opencontainers.image.source=https://github.com/monome/norns
 
 # norns-ci container definition
@@ -19,7 +23,8 @@ LABEL org.opencontainers.image.source=https://github.com/monome/norns
 #
 #    % docker run -v $(pwd):/norns-build --platform linux/arm64 -t ghcr.io/monome/norns-ci:latest
 #
-# You can also specify the registry as a cache source when building the container locally:
+# You can also specify the registry as a cache source when building the container locally,
+# but note that the registry will likely only have linux/arm/v8 (32-bit) container layers cached.
 #
 #    % docker build -t norns-ci . --cache-from ghcr.io/monome/norns-ci:latest
 #
@@ -42,10 +47,6 @@ ENV LANG=C.UTF-8 \
     SUPERCOLLIDER_VERSION=3.13.0 \
     SUPERCOLLIDER_PLUGINS_VERSION=3.13.0 \
     NNG_VERSION=1.11
-
-RUN \
-    rm /etc/apt/sources.list && \
-    echo 'deb [trusted=yes] http://raspbian.raspberrypi.org/raspbian/ bullseye main contrib non-free rpi' > /etc/apt/sources.list
 
 RUN apt-get update -yq && apt-get install -y \
     bc \
