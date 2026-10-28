@@ -19,6 +19,7 @@ runs:
       with:
         imageName: ghcr.io/monome/norns-ci
         cacheFrom: ghcr.io/monome/norns-ci
+        platform: linux/arm/v8
         push: filter
         refFilterForPush: refs/heads/main
         runCmd: ./waf configure --release && ./waf build --release
